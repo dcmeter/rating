@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nord Cleaning Ratings</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#fff; --ink:#1b2430; --mute:#667085; --line:#e4e7ec;
+  --accent:#0b5cad; --accent-soft:#e6f0fa; --bar:#7aa7d6;
+  --good:#127a46; --good-bg:#e3f4ea; --ok:#7a6a00; --ok-bg:#faf3cc;
+  --warn:#a35a00; --warn-bg:#fdebd0; --bad:#a3231b; --bad-bg:#fbe3e1;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151c; --card:#18202a; --ink:#e8ecf1; --mute:#93a0b0; --line:#2a3441;
+    --accent:#6fb0f0; --accent-soft:#1c2c3f; --bar:#3f6f9f;
+    --good:#6fd29a; --good-bg:#16342a; --ok:#e6d26a; --ok-bg:#332f12;
+    --warn:#f0b36a; --warn-bg:#392a14; --bad:#f08a82; --bad-bg:#3a1c1a;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+h1{font-size:22px;margin:0;font-weight:650}
+.upd{color:var(--mute);font-size:13px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tab{appearance:none;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab[aria-selected=true]{color:var(--accent);border-color:var(--accent)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+label{display:block;font-size:12px;color:var(--mute);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:38px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.1}
+.kpi .l{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;font-weight:600}
+.badge{display:inline-block;min-width:44px;text-align:center;border-radius:6px;padding:1px 8px;font-weight:700;font-variant-numeric:tabular-nums}
+.r-good{background:var(--good-bg);color:var(--good)} .r-ok{background:var(--ok-bg);color:var(--ok)}
+.r-warn{background:var(--warn-bg);color:var(--warn)} .r-bad{background:var(--bad-bg);color:var(--bad)} .r-na{color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+th{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:var(--card);cursor:pointer;user-select:none}
+th[aria-sort=ascending]::after{content:" ▲"} th[aria-sort=descending]::after{content:" ▼"}
+.scroll{overflow-x:auto;max-height:70vh}
+.bar{display:flex;align-items:center;gap:10px}
+.bar .track{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden;min-width:40px}
+.bar .fill{height:100%;background:var(--bar);border-radius:5px}
+.muted{color:var(--mute)} .empty{padding:28px;text-align:center;color:var(--mute)}
+h2{font-size:15px;margin:0 0 10px}
+.more{display:block;margin:12px auto 0}
+.note{font-size:12px;color:var(--mute);margin-top:10px}
+@media (max-width:600px){.bar .track{display:none}.bar{justify-content:flex-end}th,td{padding:8px 6px}.bar{gap:6px}.kpi .v{font-size:24px}.tab{padding:10px 12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Nord Cleaning Ratings</h1>
+    <span class="upd" id="upd">Loading…</span>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-vendor" aria-selected="true" data-tab="vendor">Vendor wise</button>
+    <button class="tab" role="tab" id="tab-team" aria-selected="false" data-tab="team">Team wise</button>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <div><label for="from">From</label><input type="date" id="from"></div>
+      <div><label for="to">To</label><input type="date" id="to"></div>
+      <div id="officeBox" hidden><label for="office">Local office</label><select id="office"></select></div>
+      <div id="vendorBox"><label for="who">Breezeway ID</label>
+        <input id="who" list="whoList" placeholder="Type to search…" autocomplete="off"><datalist id="whoList"></datalist></div>
+      <div id="teamBox" hidden><label for="q">Search team member</label>
+        <input id="q" placeholder="Type a name…" autocomplete="off"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div id="out"></div>
+  <p class="note">Rating = average of guest cleaning ratings (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.</p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SHORT = ["No issues","Windows","Grill","Annex","Floor","Bathroom","Mold","Kitchen","Fridge","Oven","Microwave","Dishwasher","Others"];
+let DS = {}, tab = 'vendor', sortKey = 'rating', sortDir = -1, shown = 300;
+
+/* ---------- helpers ---------- */
+const fmtD = d => d.toISOString().slice(0,10);
+const addDays = (s,n) => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return fmtD(d); };
+const rating = (sum,cnt) => cnt ? sum/cnt : null;
+function badge(r){
+  if (r==null) return '<span class="r-na">–</span>';
+  const c = r>=4.5?'r-good':r>=4?'r-ok':r>=3.5?'r-warn':'r-bad';
+  return `<span class="badge ${c}">${r.toFixed(2)}</span>`;
+}
+const pct = x => x ? (x*100).toFixed(0)+'%' : '–';
+
+/* ---------- aggregation (same logic as the Excel AVERAGEIFS / SUMIFS) ---------- */
+function aggregate(ds, from, to, officeIdx){
+  const di0 = ds.dates.findIndex(d => d >= from);
+  const m = new Map();
+  if (di0 < 0) return m;
+  const ok = ds.dates.map(d => d >= from && d <= to);
+  for (const r of ds.rows){
+    if (!ok[r[0]]) continue;
+    if (officeIdx >= 0 && r[1] !== officeIdx) continue;
+    const key = r[1]+'|'+r[2];
+    let a = m.get(key);
+    if (!a){ a = {o:r[1], n:r[2], rsum:0, rcnt:0, iss:new Array(13).fill(0)}; m.set(key,a); }
+    a.rsum += r[3]; a.rcnt += r[4];
+    for (let i=0;i<13;i++) a.iss[i] += r[5+i];
+  }
+  return m;
+}
+const totalIssues = iss => { let t=0; for (let i=1;i<13;i++) t+=iss[i]; return t; };
+
+/* ---------- state <-> URL hash (so a vendor can bookmark/share their own link) ---------- */
+function readHash(){
+  const p = new URLSearchParams(location.hash.slice(1));
+  return Object.fromEntries(p.entries());
+}
+function writeHash(){
+  const p = new URLSearchParams();
+  p.set('tab', tab);
+  if ($('#from').value) p.set('from', $('#from').value);
+  if ($('#to').value) p.set('to', $('#to').value);
+  if (tab==='team' && $('#office').value) p.set('office', $('#office').value);
+  if (tab==='vendor' && $('#who').value) p.set('vendor', $('#who').value);
+  history.replaceState(null,'','#'+p.toString());
+}
+
+/* ---------- UI ---------- */
+function setTab(t){
+  tab = t;
+  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', b.dataset.tab===t);
+  $('#vendorBox').hidden = t!=='vendor';
+  $('#teamBox').hidden = t!=='team';
+  $('#officeBox').hidden = t!=='team';
+  fillOffices(); render();
+}
+function fillOffices(){
+  const ds = DS[tab], cur = $('#office').value;
+  $('#office').innerHTML = '<option value="">All offices</option>' +
+    ds.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  if (ds.offices.includes(cur)) $('#office').value = cur;
+}
+function fillVendors(){
+  const ds = DS.vendor, from=$('#from').value, to=$('#to').value;
+  const oi = -1; // vendor view always covers all offices
+  const seen = new Set();
+  for (const r of ds.rows){
+    if (ds.dates[r[0]] < from || ds.dates[r[0]] > to) continue;
+    if (oi>=0 && r[1]!==oi) continue;
+    seen.add(r[2]);
+  }
+  $('#whoList').innerHTML = [...seen].map(i=>ds.names[i]).sort((a,b)=>a.localeCompare(b,'da'))
+    .map(n=>`<option value="${esc(n)}">`).join('');
+}
+function presets(){
+  const max = DS.vendor.dates.at(-1), min = DS.vendor.dates[0];
+  const mStart = max.slice(0,8)+'01';
+  const pm = addDays(mStart,-1);
+  return [
+    ['Last 7 days', addDays(max,-6), max],
+    ['Last 30 days', addDays(max,-29), max],
+    ['This month', mStart, max],
+    ['Last month', pm.slice(0,8)+'01', pm],
+    ['All data', min, max],
+  ];
+}
+function drawChips(){
+  const f=$('#from').value, t=$('#to').value;
+  $('#chips').innerHTML = presets().map((p,i)=>
+    `<button class="chip" data-i="${i}" aria-pressed="${p[1]===f&&p[2]===t}">${p[0]}</button>`).join('');
+}
+
+function render(){
+  writeHash(); drawChips();
+  if (tab==='vendor'){ fillVendors(); renderVendor(); } else renderTeam();
+}
+
+function renderVendor(){
+  const ds = DS.vendor, out = $('#out');
+  const name = $('#who').value.trim();
+  const ni = ds.names.findIndex(n => n.toLowerCase()===name.toLowerCase());
+  if (!name || ni<0){
+    out.innerHTML = `<div class="panel empty">${name?'No match found for that Breezeway ID.':'Choose your Breezeway ID above to see your rating.'}</div>`;
+    return;
+  }
+  const oi = -1; // all offices
+  const m = aggregate(ds, $('#from').value, $('#to').value, oi);
+  const allow = ds.allowed && ds.allowed[ni];   // offices where this ID is the Breezeway default
+  const mine = [...m.values()].filter(a => a.n===ni && (!allow || allow.includes(a.o))).sort((a,b)=>ds.offices[a.o].localeCompare(ds.offices[b.o],'da'));
+  if (!mine.length){ out.innerHTML = '<div class="panel empty">No ratings for this Breezeway ID in the selected period.</div>'; return; }
+  const tot = {rsum:0,rcnt:0,iss:new Array(13).fill(0)};
+  for (const a of mine){ tot.rsum+=a.rsum; tot.rcnt+=a.rcnt; a.iss.forEach((v,i)=>tot.iss[i]+=v); }
+  const ti = totalIssues(tot.iss);
+  const rows = mine.map(a => `<tr><td>${esc(ds.offices[a.o])}</td><td>${badge(rating(a.rsum,a.rcnt))}</td><td>${a.rcnt}</td><td>${totalIssues(a.iss)}</td></tr>`).join('');
+  const issueRows = ds.issues.slice(1).map((l,i) => ({l, c:tot.iss[i+1]})).sort((a,b)=>b.c-a.c).map(x => {
+    const p = ti ? x.c/ti : 0;
+    return `<tr><td>${esc(x.l)}</td><td>${x.c}</td><td><div class="bar"><div class="track"><div class="fill" style="width:${(p*100).toFixed(1)}%"></div></div><span style="min-width:36px;text-align:right">${pct(p)}</span></div></td></tr>`;
+  }).join('');
+  out.innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="l">Average rating</div><div class="v">${badge(rating(tot.rsum,tot.rcnt))}</div></div>
+      <div class="kpi"><div class="l">Ratings received</div><div class="v">${tot.rcnt}</div></div>
+      <div class="kpi"><div class="l">Issues reported</div><div class="v">${ti}</div></div>
+      <div class="kpi"><div class="l">Stays without issues</div><div class="v">${tot.iss[0]}</div></div>
+    </div>
+    <div class="panel"><h2>By office</h2><div class="scroll"><table>
+      <thead><tr><th class="l">Office</th><th>Rating</th><th>Ratings</th><th>Issues</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    <div class="panel"><h2>Cleaning issues</h2><div class="scroll"><table>
+      <thead><tr><th class="l">Issue</th><th>Count</th><th class="l">Share of issues</th></tr></thead><tbody>${issueRows}</tbody></table></div></div>`;
+}
+
+function renderTeam(){
+  const ds = DS.team, out = $('#out');
+  const oi = $('#office').value ? ds.offices.indexOf($('#office').value) : -1;
+  const q = $('#q').value.trim().toLowerCase();
+  let list = [...aggregate(ds, $('#from').value, $('#to').value, oi).values()].map(a => {
+    const ti = totalIssues(a.iss);
+    return {office:ds.offices[a.o], name:ds.names[a.n], rating:rating(a.rsum,a.rcnt), rcnt:a.rcnt, ti, iss:a.iss.slice(1).map(v=>ti?v/ti:0)};
+  }).filter(r => r.rcnt>0 && (!q || r.name.toLowerCase().includes(q)));
+  const get = r => sortKey==='office'?r.office : sortKey==='name'?r.name : sortKey==='rating'?(r.rating??-1) : sortKey==='rcnt'?r.rcnt : sortKey==='ti'?r.ti : r.iss[+sortKey.slice(1)];
+  list.sort((a,b)=>{ const x=get(a), y=get(b); const c = typeof x==='string' ? x.localeCompare(y,'da') : x-y; return c*sortDir || a.name.localeCompare(b.name,'da'); });
+  if (!list.length){ out.innerHTML = '<div class="panel empty">No ratings in the selected period.</div>'; return; }
+  const th = (k,l,left) => `<th data-k="${k}" class="${left?'l':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}">${l}</th>`;
+  const head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+
+    SHORT.slice(1).map((l,i)=>th('i'+i,l+' %')).join('');
+  const body = list.slice(0,shown).map(r => `<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td>${
+    r.iss.map(p=>`<td class="${p?'':'muted'}">${pct(p)}</td>`).join('')}</tr>`).join('');
+  out.innerHTML = `<div class="panel"><h2>${list.length} team members</h2><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${
+    list.length>shown?`<button class="chip more" id="more">Show more (${list.length-shown} remaining)</button>`:''}</div>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('.tab'); if (t) return setTab(t.dataset.tab);
+  const c = e.target.closest('.chip[data-i]');
+  if (c){ const p = presets()[+c.dataset.i]; $('#from').value=p[1]; $('#to').value=p[2]; shown=300; return render(); }
+  if (e.target.id==='more'){ shown += 300; return renderTeam(); }
+  const h = e.target.closest('th[data-k]');
+  if (h){ const k=h.dataset.k; if (sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=(k==='office'||k==='name')?1:-1; } renderTeam(); }
+});
+for (const id of ['from','to','office','who','q']) $('#'+id).addEventListener('input', () => { shown=300; render(); });
+
+/* ---------- init ---------- */
+(async function(){
+  try{
+    const [v,t] = await Promise.all(['vendors','teams'].map(f => fetch(`data/${f}.json`,{cache:'no-cache'}).then(r=>{ if(!r.ok) throw 0; return r.json(); })));
+    DS = {vendor:v, team:t};
+  }catch(e){
+    $('#out').innerHTML = '<div class="panel empty">Could not load the rating data. Please try again later.</div>'; $('#upd').textContent=''; return;
+  }
+  const h = readHash(), p = presets()[1];
+  $('#from').value = h.from || p[1]; $('#to').value = h.to || p[2];
+  $('#from').min = $('#to').min = DS.vendor.dates[0]; $('#from').max = $('#to').max = DS.vendor.dates.at(-1);
+  $('#upd').textContent = `Data up to ${DS.vendor.dates.at(-1)} · updated ${DS.vendor.updated}`;
+  if (h.vendor) $('#who').value = h.vendor;
+  tab = h.tab==='team' ? 'team' : 'vendor';
+  fillOffices(); if (h.office) $('#office').value = h.office;
+  setTab(tab);
+})();
+</script>
+</body>
+</html>
