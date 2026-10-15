@@ -70,9 +70,10 @@ svg .grid{stroke:var(--line);stroke-width:1} svg .axis{fill:var(--mute);font-siz
 svg .l-v{stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
 svg .l-o{stroke:var(--mute);fill:none;stroke-width:2;stroke-dasharray:5 4}
 svg .p-v{fill:var(--accent);stroke:var(--card);stroke-width:2}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;background:var(--card);color:var(--ink);font:inherit;padding:8px 14px;cursor:pointer;min-height:38px}
-.seg button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.lang{display:inline-flex;border:1px solid rgba(255,255,255,.45);border-radius:8px;overflow:hidden;flex:none}
+.lang button{border:0;background:transparent;color:#fff;font:inherit;font-size:13px;font-weight:600;padding:5px 11px;cursor:pointer;opacity:.8}
+.lang button[aria-pressed=true]{background:#fff;color:#0b3d75;opacity:1}
 [hidden]{display:none!important}
 @media (max-width:600px){
   .hero h1{font-size:20px}.tab{padding:9px 12px}.kpi .v{font-size:26px}
@@ -85,58 +86,94 @@ svg .p-v{fill:var(--accent);stroke:var(--card);stroke-width:2}
 <body>
 <div class="wrap">
   <div class="hero"><div class="hero-in">
-    <h1>Nord Cleaning Ratings</h1>
-    <p id="upd">Loading…</p>
+    <div class="hero-top"><div><h1 data-i18n="title">Nord Cleaning Ratings</h1><p id="upd">…</p></div>
+      <div class="lang" role="group" aria-label="Language"><button id="lEN" aria-pressed="true">EN</button><button id="lDA" aria-pressed="false">DA</button></div></div>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" data-tab="vendor" aria-selected="true">Vendor wise</button>
-      <button class="tab" role="tab" data-tab="watch" aria-selected="false">Watchlist</button>
-      <button class="tab" role="tab" data-tab="team" aria-selected="false">Team wise</button>
+      <button class="tab" role="tab" data-tab="vendor" aria-selected="true" data-i18n="tabVendor">Vendor wise</button>
+      <button class="tab" role="tab" data-tab="team" aria-selected="false" data-i18n="tabTeam">Team wise</button>
     </div>
   </div></div>
 
   <div class="panel">
     <div class="filters">
-      <div><label for="from">From</label><input type="date" id="from"></div>
-      <div><label for="to">To</label><input type="date" id="to"></div>
-      <div id="officeBox" hidden><label for="office">Local office</label><select id="office"></select></div>
+      <div><label for="from" data-i18n="from">From</label><input type="date" id="from"></div>
+      <div><label for="to" data-i18n="to">To</label><input type="date" id="to"></div>
+      <div id="officeBox" hidden><label for="office" data-i18n="office">Local office</label><select id="office"></select></div>
       <div id="vendorBox"><label for="who">Breezeway ID</label>
-        <input id="who" list="whoList" placeholder="Type to search…" autocomplete="off"><datalist id="whoList"></datalist></div>
-      <div id="teamBox" hidden><label for="q">Search team member</label>
-        <input id="q" placeholder="Type a name…" autocomplete="off"></div>
-      <div id="watchKindBox" hidden><label>Show</label>
-        <div class="seg"><button id="kV" aria-pressed="true">Vendors</button><button id="kC" aria-pressed="false">Cleaners</button></div></div>
-      <div id="minBox" hidden><label for="minN">Min. ratings</label><input type="number" id="minN" min="1" value="5"></div>
-      <div id="maxBox" hidden><label for="maxR">Rating below</label><input type="number" id="maxR" min="1" max="5" step="0.1" value="3.5"></div>
+        <input id="who" list="whoList" data-i18n-ph="typeSearch" placeholder="Type to search…" autocomplete="off"><datalist id="whoList"></datalist></div>
+      <div id="teamBox" hidden><label for="q" data-i18n="searchTeam">Search team member</label>
+        <input id="q" data-i18n-ph="typeName" placeholder="Type a name…" autocomplete="off"></div>
     </div>
     <div class="chips" id="chips"></div>
   </div>
 
   <div id="out"></div>
-  <p class="note">Rating = average guest cleaning rating (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.</p>
+  <p class="note" data-i18n="note">Rating = average guest cleaning rating (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.</p>
 </div>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SHORT = ["No issues","Windows","Grill","Annex","Floor","Bathroom","Mold","Kitchen","Fridge","Oven","Microwave","Dishwasher","Others"];
-let DS = {}, tab = 'vendor', sortKey = 'rating', sortDir = 1, shown = 300, wKind = 'vendors';
+
+/* ---------- languages ---------- */
+const I18N = {
+ en:{ title:'Nord Cleaning Ratings', tabVendor:'Vendor wise', tabTeam:'Team wise', from:'From', to:'To', office:'Local office', allOffices:'All offices',
+  typeSearch:'Type to search…', searchTeam:'Search team member', typeName:'Type a name…',
+  p7:'Last 7 days', p30:'Last 30 days', pMonth:'This month', pLast:'Last month', pAll:'All data',
+  sub:'Guest cleaning ratings · data up to {d} · updated {u}',
+  kRating:'Your average rating', kRatings:'Ratings received', kIssues:'Issues reported', kNoIssues:'Stays without issues',
+  inOffice1:'in {n} office', inOffices:'in {n} offices', perRating:'{x} per rating', ofRatings:'{p} of ratings', vsOffice:'vs office average',
+  impactTitle:'Your impact on each office', byOffice:'By office',
+  impactSub:'Impact = how much the office average would change without your ratings. <b>Negative</b> means your ratings pull the office average down.',
+  hOffice:'Office', hRating:'Rating', hYour:'Your rating', hOfficeAvg:'Office avg', hGap:'Gap', hShare:'Share of office ratings', hImpact:'Impact', hImpactTip:'Change in the office average if your ratings were removed', hRatings:'Ratings',
+  trendTitle:'Weekly trend', trendSub:'Your rating each week compared with the office average.', lYour:'Your rating', lOffice:'Office average', week:'Week of {d}: {v} ({n} ratings)',
+  issuesTitle:'Cleaning issues', issuesSub:'What guests reported most often.', hIssue:'Issue', hCount:'Count', hShareIssues:'Share of issues',
+  teamN:'{n} team members', clickSort:'Click a column to sort.', hMember:'Team member', hIssues:'Issues', more:'Show more ({n} remaining)',
+  noMatch:'No match found for that Breezeway ID.', enter:'Enter your Breezeway ID above to see your rating.', noneVendor:'No ratings for this Breezeway ID in the selected period.',
+  none:'No ratings in the selected period.', err:'Could not load the rating data. Please try again later.',
+  note:'Rating = average guest cleaning rating (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.',
+  issueLabels:["No Cleaning Issues","Windows inside not clean","Grill not clean","Annex not clean","Dirty floor","Bathroom not clean","Mold issues","Kitchen not cleaned","Refrigerator not clean","Oven not clean","Microwave not clean","Dishwasher not clean","Others"],
+  short:["No issues","Windows","Grill","Annex","Floor","Bathroom","Mold","Kitchen","Fridge","Oven","Microwave","Dishwasher","Others"], loc:'en-GB' },
+ da:{ title:'Nord – rengøringsvurderinger', tabVendor:'Firma', tabTeam:'Team', from:'Fra', to:'Til', office:'Lokalt kontor', allOffices:'Alle kontorer',
+  typeSearch:'Skriv for at søge…', searchTeam:'Søg teammedlem', typeName:'Skriv et navn…',
+  p7:'Seneste 7 dage', p30:'Seneste 30 dage', pMonth:'Denne måned', pLast:'Sidste måned', pAll:'Alle data',
+  sub:'Gæsternes rengøringsvurderinger · data til {d} · opdateret {u}',
+  kRating:'Din gennemsnitlige vurdering', kRatings:'Modtagne vurderinger', kIssues:'Rapporterede problemer', kNoIssues:'Ophold uden problemer',
+  inOffice1:'i {n} kontor', inOffices:'i {n} kontorer', perRating:'{x} pr. vurdering', ofRatings:'{p} af vurderingerne', vsOffice:'i forhold til kontorets gennemsnit',
+  impactTitle:'Din effekt på hvert kontor', byOffice:'Pr. kontor',
+  impactSub:'Effekt = hvor meget kontorets gennemsnit ville ændre sig uden dine vurderinger. <b>Negativ</b> betyder, at dine vurderinger trækker kontorets gennemsnit ned.',
+  hOffice:'Kontor', hRating:'Vurdering', hYour:'Din vurdering', hOfficeAvg:'Kontor gns.', hGap:'Forskel', hShare:'Andel af kontorets vurderinger', hImpact:'Effekt', hImpactTip:'Ændring i kontorets gennemsnit, hvis dine vurderinger blev fjernet', hRatings:'Vurderinger',
+  trendTitle:'Ugentlig udvikling', trendSub:'Din vurdering hver uge sammenlignet med kontorets gennemsnit.', lYour:'Din vurdering', lOffice:'Kontorets gennemsnit', week:'Uge fra {d}: {v} ({n} vurderinger)',
+  issuesTitle:'Rengøringsproblemer', issuesSub:'Hvad gæsterne oftest har rapporteret.', hIssue:'Problem', hCount:'Antal', hShareIssues:'Andel af problemer',
+  teamN:'{n} teammedlemmer', clickSort:'Klik på en kolonne for at sortere.', hMember:'Teammedlem', hIssues:'Problemer', more:'Vis flere ({n} tilbage)',
+  noMatch:'Ingen match for dette Breezeway ID.', enter:'Indtast dit Breezeway ID ovenfor for at se din vurdering.', noneVendor:'Ingen vurderinger for dette Breezeway ID i den valgte periode.',
+  none:'Ingen vurderinger i den valgte periode.', err:'Kunne ikke indlæse vurderingsdata. Prøv igen senere.',
+  note:'Vurdering = gennemsnit af gæsternes rengøringsvurdering (1–5) for ophold med ankomstdato i den valgte periode. Problem-% = andel af alle rapporterede problemer.',
+  issueLabels:["Ingen rengøringsproblemer","Vinduer indvendigt ikke rene","Grill ikke ren","Anneks ikke rent","Snavset gulv","Badeværelse ikke rent","Skimmelproblemer","Køkken ikke gjort rent","Køleskab ikke rent","Ovn ikke ren","Mikroovn ikke ren","Opvaskemaskine ikke ren","Andet"],
+  short:["Ingen problemer","Vinduer","Grill","Anneks","Gulv","Badeværelse","Skimmel","Køkken","Køleskab","Ovn","Mikroovn","Opvaskemaskine","Andet"], loc:'da-DK' }
+};
+let lang = 'en';
+const t = (k,v) => { let s = I18N[lang][k] ?? I18N.en[k] ?? k; if (v) for (const [a,b] of Object.entries(v)) s = s.split('{'+a+'}').join(b); return s; };
+const fmtN = (x,d=2) => { const s = x.toFixed(d); return lang==='da' ? s.replace('.',',') : s; };
+
+let DS = {}, tab = 'vendor', sortKey = 'rating', sortDir = -1, shown = 300;
 
 /* ---------- helpers ---------- */
 const fmtD = d => d.toISOString().slice(0,10);
 const addDays = (s,n) => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return fmtD(d); };
 const weekStart = s => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7)); return fmtD(d); };
 const avg = (sum,cnt) => cnt ? sum/cnt : null;
-const signed = x => Math.abs(x)<0.005 ? '0.00' : (x>0?'+':'−')+Math.abs(x).toFixed(2);
+const signed = x => Math.abs(x)<0.005 ? fmtN(0) : (x>0?'+':'−')+fmtN(Math.abs(x));
 const cls = x => x==null ? 'flat' : x>=0.005 ? 'up' : x<=-0.005 ? 'down' : 'flat';
 function badge(r){
   if (r==null) return '<span class="r-na">–</span>';
   const c = r>=4.5?'r-good':r>=4?'r-ok':r>=3.5?'r-warn':'r-bad';
-  return `<span class="badge ${c}">${r.toFixed(2)}</span>`;
+  return `<span class="badge ${c}">${fmtN(r)}</span>`;
 }
 const pct = x => x ? (x*100).toFixed(0)+'%' : '–';
 const totalIssues = iss => { let t=0; for (let i=1;i<13;i++) t+=iss[i]; return t; };
-const topIssue = (iss,labels) => { let b=0,bi=-1; for (let i=1;i<13;i++) if (iss[i]>b){b=iss[i];bi=i;} return bi<0?'–':`${labels[bi]} (${pct(b/totalIssues(iss))})`; };
 const byName = (ds,n) => ds.names.findIndex(x => x.toLowerCase()===n.toLowerCase());
+const SORTCOL = (k,l,left) => `<th data-k="${k}" class="${left?'l':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}">${l}</th>`;
 
 /* ---------- aggregation (same logic as the Excel AVERAGEIFS / SUMIFS) ---------- */
 function aggregate(ds, from, to, officeIdx){
@@ -161,7 +198,7 @@ function officeTotals(ds, from, to){            // office index -> {sum,cnt} ove
   }
   return m;
 }
-/* how much does a group move its office average?  impact = office avg - office avg without the group */
+/* impact = office avg - office avg without this vendor's ratings */
 function impact(O, sum, cnt){
   if (!O || !O.cnt) return {oavg:null, gap:null, share:null, imp:null};
   const oavg = O.sum/O.cnt, rest = O.cnt-cnt;
@@ -171,28 +208,39 @@ function impact(O, sum, cnt){
 /* ---------- URL hash (so a vendor can bookmark / share their own link) ---------- */
 const readHash = () => Object.fromEntries(new URLSearchParams(location.hash.slice(1)).entries());
 function writeHash(){
-  const p = new URLSearchParams(); p.set('tab', tab);
+  const p = new URLSearchParams(); p.set('tab', tab); p.set('lang', lang);
   if ($('#from').value) p.set('from', $('#from').value);
   if ($('#to').value) p.set('to', $('#to').value);
-  if (tab!=='vendor' && $('#office').value) p.set('office', $('#office').value);
+  if (tab==='team' && $('#office').value) p.set('office', $('#office').value);
   if (tab==='vendor' && $('#who').value) p.set('vendor', $('#who').value);
   history.replaceState(null,'','#'+p.toString());
 }
 
 /* ---------- UI ---------- */
-function setTab(t){
-  tab = t;
-  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', b.dataset.tab===t);
-  $('#vendorBox').hidden = t!=='vendor';
-  $('#officeBox').hidden = t==='vendor';
-  $('#teamBox').hidden = t!=='team';
-  for (const id of ['watchKindBox','minBox','maxBox']) $('#'+id).hidden = t!=='watch';
-  sortKey = t==='team' ? 'rating' : (wKind==='vendors' ? 'imp' : 'rating'); sortDir = t==='team' ? -1 : 1; shown = 300;
+function applyStatic(){
+  document.documentElement.lang = lang;
+  document.title = t('title');
+  for (const el of document.querySelectorAll('[data-i18n]')) el.innerHTML = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll('[data-i18n-ph]')) el.placeholder = t(el.dataset.i18nPh);
+  $('#lEN').setAttribute('aria-pressed', lang==='en'); $('#lDA').setAttribute('aria-pressed', lang==='da');
+  if (DS.vendor) $('#upd').textContent = t('sub',{d:DS.vendor.dates.at(-1), u:DS.vendor.updated});
+}
+function setLang(l){
+  lang = l; try{ localStorage.setItem('lang', l); }catch(e){}
+  applyStatic(); fillOffices(); render();
+}
+function setTab(x){
+  tab = x;
+  for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', b.dataset.tab===x);
+  $('#vendorBox').hidden = x!=='vendor';
+  $('#officeBox').hidden = x!=='team';
+  $('#teamBox').hidden = x!=='team';
+  sortKey = 'rating'; sortDir = -1; shown = 300;
   fillOffices(); render();
 }
 function fillOffices(){
-  const ds = DS.vendor, cur = $('#office').value;
-  $('#office').innerHTML = '<option value="">All offices</option>' + ds.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  const ds = DS.team, cur = $('#office').value;
+  $('#office').innerHTML = `<option value="">${esc(t('allOffices'))}</option>` + ds.offices.map(o => `<option>${esc(o)}</option>`).join('');
   if (ds.offices.includes(cur)) $('#office').value = cur;
 }
 function fillVendors(){
@@ -203,16 +251,16 @@ function fillVendors(){
 function presets(){
   const max = DS.vendor.dates.at(-1), min = DS.vendor.dates[0];
   const mStart = max.slice(0,8)+'01', pm = addDays(mStart,-1);
-  return [['Last 7 days',addDays(max,-6),max],['Last 30 days',addDays(max,-29),max],['This month',mStart,max],
-          ['Last month',pm.slice(0,8)+'01',pm],['All data',min,max]];
+  return [[t('p7'),addDays(max,-6),max],[t('p30'),addDays(max,-29),max],[t('pMonth'),mStart,max],
+          [t('pLast'),pm.slice(0,8)+'01',pm],[t('pAll'),min,max]];
 }
 function drawChips(){
-  const f=$('#from').value, t=$('#to').value;
-  $('#chips').innerHTML = presets().map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${p[1]===f&&p[2]===t}">${p[0]}</button>`).join('');
+  const f=$('#from').value, to=$('#to').value;
+  $('#chips').innerHTML = presets().map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${p[1]===f&&p[2]===to}">${esc(p[0])}</button>`).join('');
 }
 function render(){
   writeHash(); drawChips();
-  if (tab==='vendor'){ fillVendors(); renderVendor(); } else if (tab==='watch') renderWatch(); else renderTeam();
+  if (tab==='vendor'){ fillVendors(); renderVendor(); } else renderTeam();
 }
 
 /* ---------- weekly trend chart (inline SVG) ---------- */
@@ -221,10 +269,9 @@ function trendSvg(ds, ni, offs, from, to){
   const add = (m,k,s,c) => { const a=m.get(k)||{s:0,c:0}; a.s+=s; a.c+=c; m.set(k,a); };
   for (const r of ds.rows){ if (r[2]!==ni||!offs.has(r[1])) continue; const d=ds.dates[r[0]]; if (d<from||d>to) continue; add(vw,weekStart(d),r[3],r[4]); }
   for (const r of ds.ot||[]){ if (!offs.has(r[1])) continue; const d=ds.dates[r[0]]; if (d<from||d>to) continue; add(ow,weekStart(d),r[2],r[3]); }
-  const weeks = [...new Set([...vw.keys()].filter(k=>vw.get(k).c>0))].sort();
+  const weeks = [...vw.keys()].filter(k=>vw.get(k).c>0).sort();
   if (weeks.length < 2) return '';
-  const first = weeks[0], last = weeks.at(-1);
-  const all = []; for (let w=first; w<=last; w=addDays(w,7)) all.push(w);
+  const all = []; for (let w=weeks[0]; w<=weeks.at(-1); w=addDays(w,7)) all.push(w);
   const V = all.map(w => vw.has(w)&&vw.get(w).c ? vw.get(w).s/vw.get(w).c : null);
   const O = all.map(w => ow.has(w)&&ow.get(w).c ? ow.get(w).s/ow.get(w).c : null);
   const vals = [...V,...O].filter(x=>x!=null);
@@ -235,12 +282,12 @@ function trendSvg(ds, ni, offs, from, to){
   let g = '';
   for (let v=lo; v<=hi; v++) g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
   const step = Math.ceil(all.length/(W<500?4:8));
-  all.forEach((w,i)=>{ if (i%step===0) g += `<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${new Date(w+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'})}</text>`; });
+  all.forEach((w,i)=>{ if (i%step===0) g += `<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${new Date(w+'T00:00:00Z').toLocaleDateString(t('loc'),{day:'numeric',month:'short',timeZone:'UTC'})}</text>`; });
   const path = arr => { let d='',pen=false; arr.forEach((v,i)=>{ if(v==null){pen=false;return;} d+=(pen?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1); pen=true; }); return d; };
   g += `<path class="l-o" d="${path(O)}"/><path class="l-v" d="${path(V)}"/>`;
-  V.forEach((v,i)=>{ if(v!=null){ const a=vw.get(all[i]); g += `<circle class="p-v" cx="${x(i)}" cy="${y(v)}" r="4"><title>Week of ${all[i]}: ${v.toFixed(2)} (${a.c} ratings)</title></circle>`; } });
-  return `<div class="legend"><span><i style="background:var(--accent)"></i>Your rating</span><span><i style="background:var(--mute)"></i>Office average</span></div>
-    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly rating trend">${g}</svg>`;
+  V.forEach((v,i)=>{ if(v!=null){ const a=vw.get(all[i]); g += `<circle class="p-v" cx="${x(i)}" cy="${y(v)}" r="4"><title>${esc(t('week',{d:all[i],v:fmtN(v),n:a.c}))}</title></circle>`; } });
+  return `<div class="legend"><span><i style="background:var(--accent)"></i>${esc(t('lYour'))}</span><span><i style="background:var(--mute)"></i>${esc(t('lOffice'))}</span></div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t('trendTitle'))}">${g}</svg>`;
 }
 
 /* ---------- vendor view ---------- */
@@ -248,13 +295,13 @@ function renderVendor(){
   const ds = DS.vendor, out = $('#out'), name = $('#who').value.trim();
   const ni = byName(ds,name), from=$('#from').value, to=$('#to').value;
   if (!name || ni<0){
-    out.innerHTML = `<div class="panel empty">${name?'No match found for that Breezeway ID.':'Enter your Breezeway ID above to see your rating.'}</div>`; return;
+    out.innerHTML = `<div class="panel empty">${esc(name?t('noMatch'):t('enter'))}</div>`; return;
   }
   const allow = ds.allowed && ds.allowed[ni];
   const m = aggregate(ds, from, to, -1);
   const mine = [...m.values()].filter(a => a.n===ni && a.rcnt>0 && (!allow || allow.includes(a.o)))
     .sort((a,b)=>ds.offices[a.o].localeCompare(ds.offices[b.o],'da'));
-  if (!mine.length){ out.innerHTML = '<div class="panel empty">No ratings for this Breezeway ID in the selected period.</div>'; return; }
+  if (!mine.length){ out.innerHTML = `<div class="panel empty">${esc(t('noneVendor'))}</div>`; return; }
   const OT = officeTotals(ds, from, to), hasOT = OT.size>0;
   const tot = {rsum:0,rcnt:0,iss:new Array(13).fill(0)}; let oS=0,oC=0;
   for (const a of mine){ tot.rsum+=a.rsum; tot.rcnt+=a.rcnt; a.iss.forEach((v,i)=>tot.iss[i]+=v); const O=OT.get(a.o); if(O){oS+=O.sum;oC+=O.cnt;} }
@@ -263,64 +310,31 @@ function renderVendor(){
   const rows = mine.map(a => {
     const k = impact(OT.get(a.o), a.rsum, a.rcnt);
     return `<tr><td>${esc(ds.offices[a.o])}</td><td>${badge(avg(a.rsum,a.rcnt))}</td>${hasOT?`
-      <td>${k.oavg==null?'–':k.oavg.toFixed(2)}</td><td class="hide-sm ${cls(k.gap)}">${k.gap==null?'–':signed(k.gap)}</td>
+      <td>${k.oavg==null?'–':fmtN(k.oavg)}</td><td class="hide-sm ${cls(k.gap)}">${k.gap==null?'–':signed(k.gap)}</td>
       <td class="hide-sm">${k.share==null?'–':pct(k.share)}</td><td class="${cls(k.imp)}">${k.imp==null?'–':signed(k.imp)}</td>`:''}
       <td>${a.rcnt}</td></tr>`;
   }).join('');
-  const issueRows = ds.issues.slice(1).map((l,i)=>({l,c:tot.iss[i+1]})).sort((a,b)=>b.c-a.c).map(x=>{
+  const labels = I18N[lang].issueLabels;
+  const issueRows = labels.slice(1).map((l,i)=>({l,c:tot.iss[i+1]})).sort((a,b)=>b.c-a.c).map(x=>{
     const p = ti ? x.c/ti : 0;
     return `<tr><td>${esc(x.l)}</td><td>${x.c}</td><td><div class="bar"><div class="track"><div class="fill" style="width:${(p*100).toFixed(1)}%"></div></div><span style="min-width:36px;text-align:right">${pct(p)}</span></div></td></tr>`;
   }).join('');
   const offs = new Set(mine.map(a=>a.o)), trend = trendSvg(ds, ni, offs, from, to);
   out.innerHTML = `
     <div class="kpis">
-      <div class="kpi"><div class="l">Your average rating</div><div class="v">${badge(myAvg)}</div>
-        <div class="s">${gap==null?'&nbsp;':`<span class="${cls(gap)}">${signed(gap)}</span> vs office average ${offAvg.toFixed(2)}`}</div></div>
-      <div class="kpi"><div class="l">Ratings received</div><div class="v">${tot.rcnt}</div><div class="s">in ${mine.length} office${mine.length>1?'s':''}</div></div>
-      <div class="kpi"><div class="l">Issues reported</div><div class="v">${ti}</div><div class="s">${tot.rcnt?(ti/tot.rcnt).toFixed(1):'0'} per rating</div></div>
-      <div class="kpi"><div class="l">Stays without issues</div><div class="v">${tot.iss[0]}</div><div class="s">${pct(tot.rcnt?tot.iss[0]/tot.rcnt:0)} of ratings</div></div>
+      <div class="kpi"><div class="l">${esc(t('kRating'))}</div><div class="v">${badge(myAvg)}</div>
+        <div class="s">${gap==null?'&nbsp;':`<span class="${cls(gap)}">${signed(gap)}</span> ${esc(t('vsOffice'))}`}</div></div>
+      <div class="kpi"><div class="l">${esc(t('kRatings'))}</div><div class="v">${tot.rcnt}</div><div class="s">${esc(t(mine.length>1?'inOffices':'inOffice1',{n:mine.length}))}</div></div>
+      <div class="kpi"><div class="l">${esc(t('kIssues'))}</div><div class="v">${ti}</div><div class="s">${esc(t('perRating',{x:fmtN(tot.rcnt?ti/tot.rcnt:0,1)}))}</div></div>
+      <div class="kpi"><div class="l">${esc(t('kNoIssues'))}</div><div class="v">${tot.iss[0]}</div><div class="s">${esc(t('ofRatings',{p:pct(tot.rcnt?tot.iss[0]/tot.rcnt:0)}))}</div></div>
     </div>
-    <div class="panel"><h2>${hasOT?'Your impact on each office':'By office'}</h2>
-      ${hasOT?'<p class="sub">Impact = how much the office average would change without your ratings. <b>Negative</b> means your ratings pull the office average down.</p>':''}
-      <div class="scroll"><table><thead><tr><th class="l">Office</th><th>Your rating</th>${hasOT?'<th>Office avg</th><th class="hide-sm">Gap</th><th class="hide-sm">Share of office ratings</th><th title="Change in the office average if your ratings were removed">Impact</th>':''}<th>Ratings</th></tr></thead><tbody>${rows}</tbody></table></div></div>
-    ${trend?`<div class="panel"><h2>Weekly trend</h2><p class="sub">Your rating each week compared with the office average.</p>${trend}</div>`:''}
-    <div class="panel"><h2>Cleaning issues</h2><p class="sub">What guests reported most often.</p><div class="scroll"><table class="issues">
-      <thead><tr><th class="l">Issue</th><th>Count</th><th class="l">Share of issues</th></tr></thead><tbody>${issueRows}</tbody></table></div></div>`;
+    <div class="panel"><h2>${esc(hasOT?t('impactTitle'):t('byOffice'))}</h2>
+      ${hasOT?`<p class="sub">${t('impactSub')}</p>`:''}
+      <div class="scroll"><table><thead><tr><th class="l">${esc(t('hOffice'))}</th><th>${esc(t('hYour'))}</th>${hasOT?`<th>${esc(t('hOfficeAvg'))}</th><th class="hide-sm">${esc(t('hGap'))}</th><th class="hide-sm">${esc(t('hShare'))}</th><th title="${esc(t('hImpactTip'))}">${esc(t('hImpact'))}</th>`:''}<th>${esc(t('hRatings'))}</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    ${trend?`<div class="panel"><h2>${esc(t('trendTitle'))}</h2><p class="sub">${esc(t('trendSub'))}</p>${trend}</div>`:''}
+    <div class="panel"><h2>${esc(t('issuesTitle'))}</h2><p class="sub">${esc(t('issuesSub'))}</p><div class="scroll"><table class="issues">
+      <thead><tr><th class="l">${esc(t('hIssue'))}</th><th>${esc(t('hCount'))}</th><th class="l">${esc(t('hShareIssues'))}</th></tr></thead><tbody>${issueRows}</tbody></table></div></div>`;
 }
-
-/* ---------- watchlist ---------- */
-function renderWatch(){
-  const from=$('#from').value, to=$('#to').value, minN=+$('#minN').value||1, maxR=+$('#maxR').value||5;
-  const out = $('#out'), officeName = $('#office').value;
-  let rowsHtml='', head='', count=0, title='', sub='';
-  if (wKind==='vendors'){
-    const ds = DS.vendor, oi = officeName ? ds.offices.indexOf(officeName) : -1, OT = officeTotals(ds, from, to);
-    const list = [...aggregate(ds,from,to,oi).values()].filter(a => {
-      const al = ds.allowed && ds.allowed[a.n]; return a.rcnt>=minN && (!al || al.includes(a.o)) && avg(a.rsum,a.rcnt) < maxR;
-    }).map(a => { const k = impact(OT.get(a.o),a.rsum,a.rcnt);
-      return {office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, oavg:k.oavg, imp:k.imp, main:topIssue(a.iss,ds.issues)}; });
-    sortList(list);
-    count = list.length; title = 'Vendors pulling an office average down'; sub = 'Biggest negative impact first. Impact = change in the office average if this vendor’s ratings were removed.';
-    head = th('office','Office',1)+th('name','Breezeway ID',1)+th('rating','Rating')+th('rcnt','Ratings')+th('oavg','Office avg')+th('imp','Impact')+th('main','Main issue',1);
-    rowsHtml = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.oavg==null?'–':r.oavg.toFixed(2)}</td><td class="${cls(r.imp)}">${r.imp==null?'–':signed(r.imp)}</td><td class="l muted">${esc(r.main)}</td></tr>`).join('');
-  } else {
-    const ds = DS.team, oi = officeName ? ds.offices.indexOf(officeName) : -1;
-    const list = [...aggregate(ds,from,to,oi).values()].filter(a=>a.rcnt>=minN && avg(a.rsum,a.rcnt)<maxR)
-      .map(a=>({office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, ti:totalIssues(a.iss), main:topIssue(a.iss,ds.issues)}));
-    sortList(list);
-    count = list.length; title = 'Cleaners needing attention'; sub = 'Lowest rating first.';
-    head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+th('main','Main issue',1);
-    rowsHtml = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td><td class="l muted">${esc(r.main)}</td></tr>`).join('');
-  }
-  if (!count){ out.innerHTML = '<div class="panel empty">Nobody matches these filters. Try a lower minimum or a higher rating limit.</div>'; return; }
-  out.innerHTML = `<div class="panel"><h2>${title} <span class="muted" style="font-weight:400">· ${count}</span></h2><p class="sub">${sub} Showing at least ${minN} ratings, rating below ${maxR}.</p>
-    <div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${rowsHtml}</tbody></table></div>${count>shown?`<button class="chip more" id="more">Show more (${count-shown} remaining)</button>`:''}</div>`;
-}
-function sortList(list){
-  const get = r => r[sortKey]==null ? (sortDir>0?Infinity:-Infinity) : r[sortKey];
-  list.sort((a,b)=>{ const x=get(a), y=get(b); const c = typeof x==='string' ? x.localeCompare(y,'da') : (x===y?0:x-y); return c*sortDir || a.name.localeCompare(b.name,'da'); });
-}
-const th = (k,l,left) => `<th data-k="${k}" class="${left?'l':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}">${l}</th>`;
 
 /* ---------- team view ---------- */
 function renderTeam(){
@@ -331,45 +345,49 @@ function renderTeam(){
     const r = {office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, ti};
     a.iss.slice(1).forEach((v,i)=>r['i'+i]=ti?v/ti:0); return r;
   }).filter(r=>r.rcnt>0 && (!q || r.name.toLowerCase().includes(q)));
-  sortList(list);
-  if (!list.length){ out.innerHTML = '<div class="panel empty">No ratings in the selected period.</div>'; return; }
-  const head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+SHORT.slice(1).map((l,i)=>th('i'+i,l+' %')).join('');
+  const get = r => r[sortKey]==null ? -Infinity : r[sortKey];
+  list.sort((a,b)=>{ const x=get(a), y=get(b); const c = typeof x==='string' ? x.localeCompare(y,'da') : (x===y?0:x-y); return c*sortDir || a.name.localeCompare(b.name,'da'); });
+  if (!list.length){ out.innerHTML = `<div class="panel empty">${esc(t('none'))}</div>`; return; }
+  const short = I18N[lang].short;
+  const head = SORTCOL('office',esc(t('hOffice')),1)+SORTCOL('name',esc(t('hMember')),1)+SORTCOL('rating',esc(t('hRating')))+SORTCOL('rcnt',esc(t('hRatings')))+SORTCOL('ti',esc(t('hIssues')))+short.slice(1).map((l,i)=>SORTCOL('i'+i,esc(l)+' %')).join('');
   const body = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td>${
-    SHORT.slice(1).map((_,i)=>`<td class="${r['i'+i]?'':'muted'}">${pct(r['i'+i])}</td>`).join('')}</tr>`).join('');
-  out.innerHTML = `<div class="panel"><h2>${list.length} team members</h2><p class="sub">Click a column to sort.</p><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${
-    list.length>shown?`<button class="chip more" id="more">Show more (${list.length-shown} remaining)</button>`:''}</div>`;
+    short.slice(1).map((_,i)=>`<td class="${r['i'+i]?'':'muted'}">${pct(r['i'+i])}</td>`).join('')}</tr>`).join('');
+  out.innerHTML = `<div class="panel"><h2>${esc(t('teamN',{n:list.length}))}</h2><p class="sub">${esc(t('clickSort'))}</p><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${
+    list.length>shown?`<button class="chip more" id="more">${esc(t('more',{n:list.length-shown}))}</button>`:''}</div>`;
 }
 
 /* ---------- events ---------- */
 document.addEventListener('click', e => {
-  const t = e.target.closest('.tab'); if (t) return setTab(t.dataset.tab);
+  if (e.target.id==='lEN') return setLang('en');
+  if (e.target.id==='lDA') return setLang('da');
+  const tb = e.target.closest('.tab'); if (tb) return setTab(tb.dataset.tab);
   const c = e.target.closest('.chip[data-i]');
   if (c){ const p = presets()[+c.dataset.i]; $('#from').value=p[1]; $('#to').value=p[2]; shown=300; return render(); }
   if (e.target.id==='more'){ shown += 300; return render(); }
-  if (e.target.id==='kV' || e.target.id==='kC'){
-    wKind = e.target.id==='kV' ? 'vendors' : 'cleaners'; sortKey = wKind==='vendors' ? 'imp' : 'rating'; sortDir = 1; shown = 300;
-    $('#kV').setAttribute('aria-pressed', wKind==='vendors'); $('#kC').setAttribute('aria-pressed', wKind==='cleaners'); return render();
-  }
   const h = e.target.closest('th[data-k]');
-  if (h){ const k=h.dataset.k; if (sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=1; } render(); }
+  if (h){ const k=h.dataset.k; if (sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=(k==='office'||k==='name')?1:-1; } render(); }
 });
-for (const id of ['from','to','office','who','q','minN','maxR']) $('#'+id).addEventListener('input', () => { shown=300; render(); });
+for (const id of ['from','to','office','who','q']) $('#'+id).addEventListener('input', () => { shown=300; render(); });
 
 /* ---------- init ---------- */
 (async function(){
+  const h = readHash();
+  let saved = null; try{ saved = localStorage.getItem('lang'); }catch(e){}
+  lang = ['en','da'].includes(h.lang) ? h.lang : ['en','da'].includes(saved) ? saved : ((navigator.language||'').toLowerCase().startsWith('da') ? 'da' : 'en');
+  applyStatic();
   try{
-    const [v,t] = await Promise.all(['vendors','teams'].map(f => fetch(`${f}.json`,{cache:'no-cache'}).then(r=>{ if(!r.ok) throw 0; return r.json(); })));
-    DS = {vendor:v, team:t};
+    const [v,tm] = await Promise.all(['vendors','teams'].map(f => fetch(`${f}.json`,{cache:'no-cache'}).then(r=>{ if(!r.ok) throw 0; return r.json(); })));
+    DS = {vendor:v, team:tm};
   }catch(e){
-    $('#out').innerHTML = '<div class="panel empty">Could not load the rating data. Please try again later.</div>'; $('#upd').textContent=''; return;
+    $('#out').innerHTML = `<div class="panel empty">${esc(t('err'))}</div>`; $('#upd').textContent=''; return;
   }
-  const h = readHash(), p = presets()[1];
+  const p = presets()[1];
   $('#from').value = h.from || p[1]; $('#to').value = h.to || p[2];
   $('#from').min = $('#to').min = DS.vendor.dates[0]; $('#from').max = $('#to').max = DS.vendor.dates.at(-1);
-  $('#upd').textContent = `Guest cleaning ratings · data up to ${DS.vendor.dates.at(-1)} · updated ${DS.vendor.updated}`;
+  applyStatic();
   if (h.vendor) $('#who').value = h.vendor;
   fillOffices(); if (h.office) $('#office').value = h.office;
-  setTab(['vendor','watch','team'].includes(h.tab) ? h.tab : 'vendor');
+  setTab(h.tab==='team' ? 'team' : 'vendor');
 })();
 </script>
 </body>
