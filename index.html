@@ -127,6 +127,7 @@ const I18N = {
   impactSub:'Impact = how much the office average would change without your ratings. <b>Negative</b> means your ratings pull the office average down.',
   hOffice:'Office', hRating:'Rating', hYour:'Your rating', hOfficeAvg:'Office avg', hGap:'Gap', hShare:'Share of office ratings', hImpact:'Impact', hImpactTip:'Change in the office average if your ratings were removed', hRatings:'Ratings',
   trendTitle:'Weekly trend', trendSub:'Your rating each week compared with the office average.', lYour:'Your rating', lOffice:'Office average', week:'Week of {d}: {v} ({n} ratings)',
+  lowTitle:'Houses with low ratings', lowSub:'Stays rated 3 or below in the selected period. Only the house ID is shown.', hHouse:'House ID', hLowCnt:'Low ratings', hLowAvg:'Avg of low', hLast:'Latest', hIssuesShort:'Issues reported', lowNone:'No low-rated stays in this period. 🎉', lowMore:'Showing {n} of {t} houses.',
   issuesTitle:'Cleaning issues', issuesSub:'What guests reported most often.', hIssue:'Issue', hCount:'Count', hShareIssues:'Share of issues',
   teamN:'{n} team members', clickSort:'Click a column to sort.', hMember:'Team member', hIssues:'Issues', more:'Show more ({n} remaining)',
   noMatch:'No match found for that Breezeway ID.', enter:'Enter your Breezeway ID above to see your rating.', noneVendor:'No ratings for this Breezeway ID in the selected period.',
@@ -144,6 +145,7 @@ const I18N = {
   impactSub:'Effekt = hvor meget kontorets gennemsnit ville ændre sig uden dine vurderinger. <b>Negativ</b> betyder, at dine vurderinger trækker kontorets gennemsnit ned.',
   hOffice:'Kontor', hRating:'Vurdering', hYour:'Din vurdering', hOfficeAvg:'Kontor gns.', hGap:'Forskel', hShare:'Andel af kontorets vurderinger', hImpact:'Effekt', hImpactTip:'Ændring i kontorets gennemsnit, hvis dine vurderinger blev fjernet', hRatings:'Vurderinger',
   trendTitle:'Ugentlig udvikling', trendSub:'Din vurdering hver uge sammenlignet med kontorets gennemsnit.', lYour:'Din vurdering', lOffice:'Kontorets gennemsnit', week:'Uge fra {d}: {v} ({n} vurderinger)',
+  lowTitle:'Huse med lave vurderinger', lowSub:'Ophold vurderet 3 eller lavere i den valgte periode. Kun hus-ID vises.', hHouse:'Hus-ID', hLowCnt:'Lave vurd.', hLowAvg:'Gns. af lave', hLast:'Seneste', hIssuesShort:'Rapporterede problemer', lowNone:'Ingen lavt vurderede ophold i perioden. 🎉', lowMore:'Viser {n} af {t} huse.',
   issuesTitle:'Rengøringsproblemer', issuesSub:'Hvad gæsterne oftest har rapporteret.', hIssue:'Problem', hCount:'Antal', hShareIssues:'Andel af problemer',
   teamN:'{n} teammedlemmer', clickSort:'Klik på en kolonne for at sortere.', hMember:'Teammedlem', hIssues:'Problemer', more:'Vis flere ({n} tilbage)',
   noMatch:'Ingen match for dette Breezeway ID.', enter:'Indtast dit Breezeway ID ovenfor for at se din vurdering.', noneVendor:'Ingen vurderinger for dette Breezeway ID i den valgte periode.',
@@ -291,6 +293,29 @@ function trendSvg(ds, ni, offs, from, to){
 }
 
 /* ---------- vendor view ---------- */
+function lowHouses(ds, ni, allow, from, to){
+  const m = new Map();
+  for (const r of ds.low||[]){
+    if (r[2]!==ni) continue;
+    const d = ds.dates[r[0]]; if (d<from||d>to) continue;
+    if (allow && !allow.includes(r[1])) continue;
+    const k = r[1]+'|'+r[3];
+    let h = m.get(k); if (!h){ h={o:r[1],id:r[3],c:0,s:0,last:'',iss:new Array(13).fill(0)}; m.set(k,h); }
+    h.c++; h.s+=r[4]; if (d>h.last) h.last=d;
+    for (let b=0;b<12;b++) if (r[5] & (1<<b)) h.iss[b+1]++;
+  }
+  return [...m.values()].sort((a,b)=> b.c-a.c || a.s/a.c-b.s/b.c || b.last.localeCompare(a.last));
+}
+function lowPanel(ds, ni, allow, from, to){
+  const L = lowHouses(ds, ni, allow, from, to), CAP = 1000, short = I18N[lang].short;
+  const body = L.slice(0,CAP).map(h=>{
+    const is = h.iss.map((c,i)=>({c,i})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c).slice(0,3).map(x=>short[x.i]+(x.c>1?' ×'+x.c:'')).join(', ');
+    return `<tr><td class="l"><b>${esc(h.id)}</b></td><td class="l">${esc(ds.offices[h.o])}</td><td>${h.c}</td><td>${badge(h.s/h.c)}</td><td class="hide-sm">${esc(h.last)}</td><td class="l hide-sm">${esc(is||'–')}</td></tr>`;
+  }).join('');
+  return `<div class="panel"><h2>${esc(t('lowTitle'))}</h2><p class="sub">${esc(t('lowSub'))}</p>`+
+    (L.length ? `<div class="scroll"><table><thead><tr><th class="l">${esc(t('hHouse'))}</th><th class="l">${esc(t('hOffice'))}</th><th>${esc(t('hLowCnt'))}</th><th>${esc(t('hLowAvg'))}</th><th class="hide-sm">${esc(t('hLast'))}</th><th class="l hide-sm">${esc(t('hIssuesShort'))}</th></tr></thead><tbody>${body}</tbody></table></div>`+
+      (L.length>CAP?`<p class="sub" style="margin-top:8px">${esc(t('lowMore',{n:CAP,t:L.length}))}</p>`:'') : `<p class="sub">${esc(t('lowNone'))}</p>`) + `</div>`;
+}
 function renderVendor(){
   const ds = DS.vendor, out = $('#out'), name = $('#who').value.trim();
   const ni = byName(ds,name), from=$('#from').value, to=$('#to').value;
@@ -332,6 +357,7 @@ function renderVendor(){
       ${hasOT?`<p class="sub">${t('impactSub')}</p>`:''}
       <div class="scroll"><table><thead><tr><th class="l">${esc(t('hOffice'))}</th><th>${esc(t('hYour'))}</th>${hasOT?`<th>${esc(t('hOfficeAvg'))}</th><th class="hide-sm">${esc(t('hGap'))}</th><th class="hide-sm">${esc(t('hShare'))}</th><th title="${esc(t('hImpactTip'))}">${esc(t('hImpact'))}</th>`:''}<th>${esc(t('hRatings'))}</th></tr></thead><tbody>${rows}</tbody></table></div></div>
     ${trend?`<div class="panel"><h2>${esc(t('trendTitle'))}</h2><p class="sub">${esc(t('trendSub'))}</p>${trend}</div>`:''}
+    ${ds.low?lowPanel(ds, ni, allow, from, to):''}
     <div class="panel"><h2>${esc(t('issuesTitle'))}</h2><p class="sub">${esc(t('issuesSub'))}</p><div class="scroll"><table class="issues">
       <thead><tr><th class="l">${esc(t('hIssue'))}</th><th>${esc(t('hCount'))}</th><th class="l">${esc(t('hShareIssues'))}</th></tr></thead><tbody>${issueRows}</tbody></table></div></div>`;
 }
