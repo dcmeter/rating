@@ -6,29 +6,32 @@
 <title>Nord Cleaning Ratings</title>
 <style>
 :root{
-  --bg:#f6f7f9; --card:#fff; --ink:#1b2430; --mute:#667085; --line:#e4e7ec;
+  --bg:#f4f6f9; --card:#fff; --ink:#18212d; --mute:#667085; --line:#e3e7ee; --soft:#f0f3f8;
   --accent:#0b5cad; --accent-soft:#e6f0fa; --bar:#7aa7d6;
-  --good:#127a46; --good-bg:#e3f4ea; --ok:#7a6a00; --ok-bg:#faf3cc;
-  --warn:#a35a00; --warn-bg:#fdebd0; --bad:#a3231b; --bad-bg:#fbe3e1;
+  --good:#127a46; --good-bg:#e1f3e8; --ok:#7a6a00; --ok-bg:#faf3cc;
+  --warn:#a35a00; --warn-bg:#fdebd0; --bad:#b3261e; --bad-bg:#fbe3e1;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#10151c; --card:#18202a; --ink:#e8ecf1; --mute:#93a0b0; --line:#2a3441;
+  :root{
+    --bg:#0f141b; --card:#171f29; --ink:#e8ecf1; --mute:#93a0b0; --line:#2a3441; --soft:#1d2733;
     --accent:#6fb0f0; --accent-soft:#1c2c3f; --bar:#3f6f9f;
     --good:#6fd29a; --good-bg:#16342a; --ok:#e6d26a; --ok-bg:#332f12;
-    --warn:#f0b36a; --warn-bg:#392a14; --bad:#f08a82; --bad-bg:#3a1c1a;
+    --warn:#f0b36a; --warn-bg:#392a14; --bad:#f48b83; --bad-bg:#3a1c1a; --shadow:none;
   }
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;margin-bottom:16px}
-h1{font-size:22px;margin:0;font-weight:650}
-.upd{color:var(--mute);font-size:13px}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
-.tab{appearance:none;border:0;background:none;color:var(--mute);font:inherit;font-weight:600;padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
-.tab[aria-selected=true]{color:var(--accent);border-color:var(--accent)}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 48px}
+.hero{background:linear-gradient(135deg,#0b3d75,#0b5cad 60%,#2b7bc9);color:#fff;margin:0 -16px 20px;padding:22px 16px 0}
+.hero-in{max-width:1180px;margin:0 auto}
+.hero h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.hero p{margin:2px 0 0;opacity:.85;font-size:13.5px}
+.tabs{display:flex;gap:4px;margin-top:16px}
+.tab{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.78);font:inherit;font-weight:600;padding:10px 18px;cursor:pointer;border-radius:10px 10px 0 0}
+.tab:hover{color:#fff}
+.tab[aria-selected=true]{background:var(--bg);color:var(--accent)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow)}
 .filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
 label{display:block;font-size:12px;color:var(--mute);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
 input,select{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:38px}
@@ -36,40 +39,60 @@ input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);ou
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
-.kpi .v{font-size:30px;font-weight:700;line-height:1.1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
 .kpi .l{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;font-weight:600}
-.badge{display:inline-block;min-width:44px;text-align:center;border-radius:6px;padding:1px 8px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .v{font-size:32px;font-weight:700;line-height:1.2;margin-top:2px}
+.kpi .s{font-size:13px;color:var(--mute);margin-top:2px}
+.badge{display:inline-block;min-width:46px;text-align:center;border-radius:8px;padding:0 9px;font-weight:700;font-variant-numeric:tabular-nums}
 .r-good{background:var(--good-bg);color:var(--good)} .r-ok{background:var(--ok-bg);color:var(--ok)}
 .r-warn{background:var(--warn-bg);color:var(--warn)} .r-bad{background:var(--bad-bg);color:var(--bad)} .r-na{color:var(--mute)}
+.up{color:var(--good);font-weight:600} .down{color:var(--bad);font-weight:600} .flat{color:var(--mute)}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
 th:first-child,td:first-child,th.l,td.l{text-align:left}
-th{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:var(--card);cursor:pointer;user-select:none}
+th{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:var(--card);user-select:none}
+th[data-k]{cursor:pointer}
 th[aria-sort=ascending]::after{content:" ▲"} th[aria-sort=descending]::after{content:" ▼"}
 .scroll{overflow-x:auto;max-height:70vh}
 .bar{display:flex;align-items:center;gap:10px}
-.bar .track{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden;min-width:40px}
+.bar .track{flex:1;height:10px;background:var(--soft);border-radius:5px;overflow:hidden;min-width:40px}
 .bar .fill{height:100%;background:var(--bar);border-radius:5px}
 .muted{color:var(--mute)} .empty{padding:28px;text-align:center;color:var(--mute)}
-h2{font-size:15px;margin:0 0 10px}
+h2{font-size:16px;margin:0 0 4px} .sub{font-size:13px;color:var(--mute);margin:0 0 12px}
 .more{display:block;margin:12px auto 0}
-.note{font-size:12px;color:var(--mute);margin-top:10px}
-@media (max-width:600px){.bar .track{display:none}.bar{justify-content:flex-end}th,td{padding:8px 6px}.bar{gap:6px}.kpi .v{font-size:24px}.tab{padding:10px 12px}}
+.note{font-size:12px;color:var(--mute);margin-top:12px}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--mute);margin-bottom:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+svg.chart{width:100%;height:auto;display:block}
+svg .grid{stroke:var(--line);stroke-width:1} svg .axis{fill:var(--mute);font-size:11px}
+svg .l-v{stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+svg .l-o{stroke:var(--mute);fill:none;stroke-width:2;stroke-dasharray:5 4}
+svg .p-v{fill:var(--accent);stroke:var(--card);stroke-width:2}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--card);color:var(--ink);font:inherit;padding:8px 14px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+[hidden]{display:none!important}
+@media (max-width:600px){
+  .hero h1{font-size:20px}.tab{padding:9px 12px}.kpi .v{font-size:26px}
+  .bar .track{min-width:28px}.bar{gap:6px}th,td{padding:8px 6px}.hide-sm{display:none}th{white-space:normal;line-height:1.2;vertical-align:bottom}
+  td:first-child,th:first-child{white-space:normal}
+  .issues th:nth-child(2),.issues td:nth-child(2){display:none}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <div class="hero"><div class="hero-in">
     <h1>Nord Cleaning Ratings</h1>
-    <span class="upd" id="upd">Loading…</span>
-  </header>
-
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" id="tab-vendor" aria-selected="true" data-tab="vendor">Vendor wise</button>
-    <button class="tab" role="tab" id="tab-team" aria-selected="false" data-tab="team">Team wise</button>
-  </div>
+    <p id="upd">Loading…</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="vendor" aria-selected="true">Vendor wise</button>
+      <button class="tab" role="tab" data-tab="watch" aria-selected="false">Watchlist</button>
+      <button class="tab" role="tab" data-tab="team" aria-selected="false">Team wise</button>
+    </div>
+  </div></div>
 
   <div class="panel">
     <div class="filters">
@@ -80,37 +103,45 @@ h2{font-size:15px;margin:0 0 10px}
         <input id="who" list="whoList" placeholder="Type to search…" autocomplete="off"><datalist id="whoList"></datalist></div>
       <div id="teamBox" hidden><label for="q">Search team member</label>
         <input id="q" placeholder="Type a name…" autocomplete="off"></div>
+      <div id="watchKindBox" hidden><label>Show</label>
+        <div class="seg"><button id="kV" aria-pressed="true">Vendors</button><button id="kC" aria-pressed="false">Cleaners</button></div></div>
+      <div id="minBox" hidden><label for="minN">Min. ratings</label><input type="number" id="minN" min="1" value="5"></div>
+      <div id="maxBox" hidden><label for="maxR">Rating below</label><input type="number" id="maxR" min="1" max="5" step="0.1" value="3.5"></div>
     </div>
     <div class="chips" id="chips"></div>
   </div>
 
   <div id="out"></div>
-  <p class="note">Rating = average of guest cleaning ratings (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.</p>
+  <p class="note">Rating = average guest cleaning rating (1–5) for stays with an arrival date in the selected period. Issue % = share of all reported issues.</p>
 </div>
 
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const SHORT = ["No issues","Windows","Grill","Annex","Floor","Bathroom","Mold","Kitchen","Fridge","Oven","Microwave","Dishwasher","Others"];
-let DS = {}, tab = 'vendor', sortKey = 'rating', sortDir = -1, shown = 300;
+let DS = {}, tab = 'vendor', sortKey = 'rating', sortDir = 1, shown = 300, wKind = 'vendors';
 
 /* ---------- helpers ---------- */
 const fmtD = d => d.toISOString().slice(0,10);
 const addDays = (s,n) => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return fmtD(d); };
-const rating = (sum,cnt) => cnt ? sum/cnt : null;
+const weekStart = s => { const d = new Date(s+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7)); return fmtD(d); };
+const avg = (sum,cnt) => cnt ? sum/cnt : null;
+const signed = x => Math.abs(x)<0.005 ? '0.00' : (x>0?'+':'−')+Math.abs(x).toFixed(2);
+const cls = x => x==null ? 'flat' : x>=0.005 ? 'up' : x<=-0.005 ? 'down' : 'flat';
 function badge(r){
   if (r==null) return '<span class="r-na">–</span>';
   const c = r>=4.5?'r-good':r>=4?'r-ok':r>=3.5?'r-warn':'r-bad';
   return `<span class="badge ${c}">${r.toFixed(2)}</span>`;
 }
 const pct = x => x ? (x*100).toFixed(0)+'%' : '–';
+const totalIssues = iss => { let t=0; for (let i=1;i<13;i++) t+=iss[i]; return t; };
+const topIssue = (iss,labels) => { let b=0,bi=-1; for (let i=1;i<13;i++) if (iss[i]>b){b=iss[i];bi=i;} return bi<0?'–':`${labels[bi]} (${pct(b/totalIssues(iss))})`; };
+const byName = (ds,n) => ds.names.findIndex(x => x.toLowerCase()===n.toLowerCase());
 
 /* ---------- aggregation (same logic as the Excel AVERAGEIFS / SUMIFS) ---------- */
 function aggregate(ds, from, to, officeIdx){
-  const di0 = ds.dates.findIndex(d => d >= from);
-  const m = new Map();
-  if (di0 < 0) return m;
   const ok = ds.dates.map(d => d >= from && d <= to);
+  const m = new Map();
   for (const r of ds.rows){
     if (!ok[r[0]]) continue;
     if (officeIdx >= 0 && r[1] !== officeIdx) continue;
@@ -122,19 +153,28 @@ function aggregate(ds, from, to, officeIdx){
   }
   return m;
 }
-const totalIssues = iss => { let t=0; for (let i=1;i<13;i++) t+=iss[i]; return t; };
-
-/* ---------- state <-> URL hash (so a vendor can bookmark/share their own link) ---------- */
-function readHash(){
-  const p = new URLSearchParams(location.hash.slice(1));
-  return Object.fromEntries(p.entries());
+function officeTotals(ds, from, to){            // office index -> {sum,cnt} over ALL vendors
+  const m = new Map();
+  for (const r of ds.ot||[]){
+    const d = ds.dates[r[0]]; if (d<from||d>to) continue;
+    const a = m.get(r[1]) || {sum:0,cnt:0}; a.sum+=r[2]; a.cnt+=r[3]; m.set(r[1],a);
+  }
+  return m;
 }
+/* how much does a group move its office average?  impact = office avg - office avg without the group */
+function impact(O, sum, cnt){
+  if (!O || !O.cnt) return {oavg:null, gap:null, share:null, imp:null};
+  const oavg = O.sum/O.cnt, rest = O.cnt-cnt;
+  return {oavg, gap: cnt? sum/cnt-oavg : null, share: cnt/O.cnt, imp: rest>0 ? oavg-(O.sum-sum)/rest : null};
+}
+
+/* ---------- URL hash (so a vendor can bookmark / share their own link) ---------- */
+const readHash = () => Object.fromEntries(new URLSearchParams(location.hash.slice(1)).entries());
 function writeHash(){
-  const p = new URLSearchParams();
-  p.set('tab', tab);
+  const p = new URLSearchParams(); p.set('tab', tab);
   if ($('#from').value) p.set('from', $('#from').value);
   if ($('#to').value) p.set('to', $('#to').value);
-  if (tab==='team' && $('#office').value) p.set('office', $('#office').value);
+  if (tab!=='vendor' && $('#office').value) p.set('office', $('#office').value);
   if (tab==='vendor' && $('#who').value) p.set('vendor', $('#who').value);
   history.replaceState(null,'','#'+p.toString());
 }
@@ -144,102 +184,159 @@ function setTab(t){
   tab = t;
   for (const b of document.querySelectorAll('.tab')) b.setAttribute('aria-selected', b.dataset.tab===t);
   $('#vendorBox').hidden = t!=='vendor';
+  $('#officeBox').hidden = t==='vendor';
   $('#teamBox').hidden = t!=='team';
-  $('#officeBox').hidden = t!=='team';
+  for (const id of ['watchKindBox','minBox','maxBox']) $('#'+id).hidden = t!=='watch';
+  sortKey = t==='team' ? 'rating' : (wKind==='vendors' ? 'imp' : 'rating'); sortDir = t==='team' ? -1 : 1; shown = 300;
   fillOffices(); render();
 }
 function fillOffices(){
-  const ds = DS[tab], cur = $('#office').value;
-  $('#office').innerHTML = '<option value="">All offices</option>' +
-    ds.offices.map(o => `<option>${esc(o)}</option>`).join('');
+  const ds = DS.vendor, cur = $('#office').value;
+  $('#office').innerHTML = '<option value="">All offices</option>' + ds.offices.map(o => `<option>${esc(o)}</option>`).join('');
   if (ds.offices.includes(cur)) $('#office').value = cur;
 }
 function fillVendors(){
-  const ds = DS.vendor, from=$('#from').value, to=$('#to').value;
-  const oi = -1; // vendor view always covers all offices
-  const seen = new Set();
-  for (const r of ds.rows){
-    if (ds.dates[r[0]] < from || ds.dates[r[0]] > to) continue;
-    if (oi>=0 && r[1]!==oi) continue;
-    seen.add(r[2]);
-  }
-  $('#whoList').innerHTML = [...seen].map(i=>ds.names[i]).sort((a,b)=>a.localeCompare(b,'da'))
-    .map(n=>`<option value="${esc(n)}">`).join('');
+  const ds = DS.vendor, from=$('#from').value, to=$('#to').value, seen = new Set();
+  for (const r of ds.rows) if (ds.dates[r[0]]>=from && ds.dates[r[0]]<=to) seen.add(r[2]);
+  $('#whoList').innerHTML = [...seen].map(i=>ds.names[i]).sort((a,b)=>a.localeCompare(b,'da')).map(n=>`<option value="${esc(n)}">`).join('');
 }
 function presets(){
   const max = DS.vendor.dates.at(-1), min = DS.vendor.dates[0];
-  const mStart = max.slice(0,8)+'01';
-  const pm = addDays(mStart,-1);
-  return [
-    ['Last 7 days', addDays(max,-6), max],
-    ['Last 30 days', addDays(max,-29), max],
-    ['This month', mStart, max],
-    ['Last month', pm.slice(0,8)+'01', pm],
-    ['All data', min, max],
-  ];
+  const mStart = max.slice(0,8)+'01', pm = addDays(mStart,-1);
+  return [['Last 7 days',addDays(max,-6),max],['Last 30 days',addDays(max,-29),max],['This month',mStart,max],
+          ['Last month',pm.slice(0,8)+'01',pm],['All data',min,max]];
 }
 function drawChips(){
   const f=$('#from').value, t=$('#to').value;
-  $('#chips').innerHTML = presets().map((p,i)=>
-    `<button class="chip" data-i="${i}" aria-pressed="${p[1]===f&&p[2]===t}">${p[0]}</button>`).join('');
+  $('#chips').innerHTML = presets().map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${p[1]===f&&p[2]===t}">${p[0]}</button>`).join('');
 }
-
 function render(){
   writeHash(); drawChips();
-  if (tab==='vendor'){ fillVendors(); renderVendor(); } else renderTeam();
+  if (tab==='vendor'){ fillVendors(); renderVendor(); } else if (tab==='watch') renderWatch(); else renderTeam();
 }
 
+/* ---------- weekly trend chart (inline SVG) ---------- */
+function trendSvg(ds, ni, offs, from, to){
+  const vw = new Map(), ow = new Map();
+  const add = (m,k,s,c) => { const a=m.get(k)||{s:0,c:0}; a.s+=s; a.c+=c; m.set(k,a); };
+  for (const r of ds.rows){ if (r[2]!==ni||!offs.has(r[1])) continue; const d=ds.dates[r[0]]; if (d<from||d>to) continue; add(vw,weekStart(d),r[3],r[4]); }
+  for (const r of ds.ot||[]){ if (!offs.has(r[1])) continue; const d=ds.dates[r[0]]; if (d<from||d>to) continue; add(ow,weekStart(d),r[2],r[3]); }
+  const weeks = [...new Set([...vw.keys()].filter(k=>vw.get(k).c>0))].sort();
+  if (weeks.length < 2) return '';
+  const first = weeks[0], last = weeks.at(-1);
+  const all = []; for (let w=first; w<=last; w=addDays(w,7)) all.push(w);
+  const V = all.map(w => vw.has(w)&&vw.get(w).c ? vw.get(w).s/vw.get(w).c : null);
+  const O = all.map(w => ow.has(w)&&ow.get(w).c ? ow.get(w).s/ow.get(w).c : null);
+  const vals = [...V,...O].filter(x=>x!=null);
+  const lo = Math.max(1, Math.floor(Math.min(...vals)-0.2)), hi = 5;
+  const W=Math.max(300,Math.min(760,($('#out').clientWidth||760)-34)),H=W<500?210:230,L=30,R=10,T=10,B=28;
+  const x = i => L + (all.length===1?0:i*(W-L-R)/(all.length-1));
+  const y = v => T + (hi-v)*(H-T-B)/(hi-lo);
+  let g = '';
+  for (let v=lo; v<=hi; v++) g += `<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+  const step = Math.ceil(all.length/(W<500?4:8));
+  all.forEach((w,i)=>{ if (i%step===0) g += `<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${new Date(w+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'UTC'})}</text>`; });
+  const path = arr => { let d='',pen=false; arr.forEach((v,i)=>{ if(v==null){pen=false;return;} d+=(pen?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1); pen=true; }); return d; };
+  g += `<path class="l-o" d="${path(O)}"/><path class="l-v" d="${path(V)}"/>`;
+  V.forEach((v,i)=>{ if(v!=null){ const a=vw.get(all[i]); g += `<circle class="p-v" cx="${x(i)}" cy="${y(v)}" r="4"><title>Week of ${all[i]}: ${v.toFixed(2)} (${a.c} ratings)</title></circle>`; } });
+  return `<div class="legend"><span><i style="background:var(--accent)"></i>Your rating</span><span><i style="background:var(--mute)"></i>Office average</span></div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Weekly rating trend">${g}</svg>`;
+}
+
+/* ---------- vendor view ---------- */
 function renderVendor(){
-  const ds = DS.vendor, out = $('#out');
-  const name = $('#who').value.trim();
-  const ni = ds.names.findIndex(n => n.toLowerCase()===name.toLowerCase());
+  const ds = DS.vendor, out = $('#out'), name = $('#who').value.trim();
+  const ni = byName(ds,name), from=$('#from').value, to=$('#to').value;
   if (!name || ni<0){
-    out.innerHTML = `<div class="panel empty">${name?'No match found for that Breezeway ID.':'Choose your Breezeway ID above to see your rating.'}</div>`;
-    return;
+    out.innerHTML = `<div class="panel empty">${name?'No match found for that Breezeway ID.':'Enter your Breezeway ID above to see your rating.'}</div>`; return;
   }
-  const oi = -1; // all offices
-  const m = aggregate(ds, $('#from').value, $('#to').value, oi);
-  const allow = ds.allowed && ds.allowed[ni];   // offices where this ID is the Breezeway default
-  const mine = [...m.values()].filter(a => a.n===ni && (!allow || allow.includes(a.o))).sort((a,b)=>ds.offices[a.o].localeCompare(ds.offices[b.o],'da'));
+  const allow = ds.allowed && ds.allowed[ni];
+  const m = aggregate(ds, from, to, -1);
+  const mine = [...m.values()].filter(a => a.n===ni && a.rcnt>0 && (!allow || allow.includes(a.o)))
+    .sort((a,b)=>ds.offices[a.o].localeCompare(ds.offices[b.o],'da'));
   if (!mine.length){ out.innerHTML = '<div class="panel empty">No ratings for this Breezeway ID in the selected period.</div>'; return; }
-  const tot = {rsum:0,rcnt:0,iss:new Array(13).fill(0)};
-  for (const a of mine){ tot.rsum+=a.rsum; tot.rcnt+=a.rcnt; a.iss.forEach((v,i)=>tot.iss[i]+=v); }
-  const ti = totalIssues(tot.iss);
-  const rows = mine.map(a => `<tr><td>${esc(ds.offices[a.o])}</td><td>${badge(rating(a.rsum,a.rcnt))}</td><td>${a.rcnt}</td><td>${totalIssues(a.iss)}</td></tr>`).join('');
-  const issueRows = ds.issues.slice(1).map((l,i) => ({l, c:tot.iss[i+1]})).sort((a,b)=>b.c-a.c).map(x => {
+  const OT = officeTotals(ds, from, to), hasOT = OT.size>0;
+  const tot = {rsum:0,rcnt:0,iss:new Array(13).fill(0)}; let oS=0,oC=0;
+  for (const a of mine){ tot.rsum+=a.rsum; tot.rcnt+=a.rcnt; a.iss.forEach((v,i)=>tot.iss[i]+=v); const O=OT.get(a.o); if(O){oS+=O.sum;oC+=O.cnt;} }
+  const ti = totalIssues(tot.iss), myAvg = avg(tot.rsum,tot.rcnt), offAvg = avg(oS,oC);
+  const gap = (myAvg!=null && offAvg!=null) ? myAvg-offAvg : null;
+  const rows = mine.map(a => {
+    const k = impact(OT.get(a.o), a.rsum, a.rcnt);
+    return `<tr><td>${esc(ds.offices[a.o])}</td><td>${badge(avg(a.rsum,a.rcnt))}</td>${hasOT?`
+      <td>${k.oavg==null?'–':k.oavg.toFixed(2)}</td><td class="hide-sm ${cls(k.gap)}">${k.gap==null?'–':signed(k.gap)}</td>
+      <td class="hide-sm">${k.share==null?'–':pct(k.share)}</td><td class="${cls(k.imp)}">${k.imp==null?'–':signed(k.imp)}</td>`:''}
+      <td>${a.rcnt}</td></tr>`;
+  }).join('');
+  const issueRows = ds.issues.slice(1).map((l,i)=>({l,c:tot.iss[i+1]})).sort((a,b)=>b.c-a.c).map(x=>{
     const p = ti ? x.c/ti : 0;
     return `<tr><td>${esc(x.l)}</td><td>${x.c}</td><td><div class="bar"><div class="track"><div class="fill" style="width:${(p*100).toFixed(1)}%"></div></div><span style="min-width:36px;text-align:right">${pct(p)}</span></div></td></tr>`;
   }).join('');
+  const offs = new Set(mine.map(a=>a.o)), trend = trendSvg(ds, ni, offs, from, to);
   out.innerHTML = `
     <div class="kpis">
-      <div class="kpi"><div class="l">Average rating</div><div class="v">${badge(rating(tot.rsum,tot.rcnt))}</div></div>
-      <div class="kpi"><div class="l">Ratings received</div><div class="v">${tot.rcnt}</div></div>
-      <div class="kpi"><div class="l">Issues reported</div><div class="v">${ti}</div></div>
-      <div class="kpi"><div class="l">Stays without issues</div><div class="v">${tot.iss[0]}</div></div>
+      <div class="kpi"><div class="l">Your average rating</div><div class="v">${badge(myAvg)}</div>
+        <div class="s">${gap==null?'&nbsp;':`<span class="${cls(gap)}">${signed(gap)}</span> vs office average ${offAvg.toFixed(2)}`}</div></div>
+      <div class="kpi"><div class="l">Ratings received</div><div class="v">${tot.rcnt}</div><div class="s">in ${mine.length} office${mine.length>1?'s':''}</div></div>
+      <div class="kpi"><div class="l">Issues reported</div><div class="v">${ti}</div><div class="s">${tot.rcnt?(ti/tot.rcnt).toFixed(1):'0'} per rating</div></div>
+      <div class="kpi"><div class="l">Stays without issues</div><div class="v">${tot.iss[0]}</div><div class="s">${pct(tot.rcnt?tot.iss[0]/tot.rcnt:0)} of ratings</div></div>
     </div>
-    <div class="panel"><h2>By office</h2><div class="scroll"><table>
-      <thead><tr><th class="l">Office</th><th>Rating</th><th>Ratings</th><th>Issues</th></tr></thead><tbody>${rows}</tbody></table></div></div>
-    <div class="panel"><h2>Cleaning issues</h2><div class="scroll"><table>
+    <div class="panel"><h2>${hasOT?'Your impact on each office':'By office'}</h2>
+      ${hasOT?'<p class="sub">Impact = how much the office average would change without your ratings. <b>Negative</b> means your ratings pull the office average down.</p>':''}
+      <div class="scroll"><table><thead><tr><th class="l">Office</th><th>Your rating</th>${hasOT?'<th>Office avg</th><th class="hide-sm">Gap</th><th class="hide-sm">Share of office ratings</th><th title="Change in the office average if your ratings were removed">Impact</th>':''}<th>Ratings</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+    ${trend?`<div class="panel"><h2>Weekly trend</h2><p class="sub">Your rating each week compared with the office average.</p>${trend}</div>`:''}
+    <div class="panel"><h2>Cleaning issues</h2><p class="sub">What guests reported most often.</p><div class="scroll"><table class="issues">
       <thead><tr><th class="l">Issue</th><th>Count</th><th class="l">Share of issues</th></tr></thead><tbody>${issueRows}</tbody></table></div></div>`;
 }
 
+/* ---------- watchlist ---------- */
+function renderWatch(){
+  const from=$('#from').value, to=$('#to').value, minN=+$('#minN').value||1, maxR=+$('#maxR').value||5;
+  const out = $('#out'), officeName = $('#office').value;
+  let rowsHtml='', head='', count=0, title='', sub='';
+  if (wKind==='vendors'){
+    const ds = DS.vendor, oi = officeName ? ds.offices.indexOf(officeName) : -1, OT = officeTotals(ds, from, to);
+    const list = [...aggregate(ds,from,to,oi).values()].filter(a => {
+      const al = ds.allowed && ds.allowed[a.n]; return a.rcnt>=minN && (!al || al.includes(a.o)) && avg(a.rsum,a.rcnt) < maxR;
+    }).map(a => { const k = impact(OT.get(a.o),a.rsum,a.rcnt);
+      return {office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, oavg:k.oavg, imp:k.imp, main:topIssue(a.iss,ds.issues)}; });
+    sortList(list);
+    count = list.length; title = 'Vendors pulling an office average down'; sub = 'Biggest negative impact first. Impact = change in the office average if this vendor’s ratings were removed.';
+    head = th('office','Office',1)+th('name','Breezeway ID',1)+th('rating','Rating')+th('rcnt','Ratings')+th('oavg','Office avg')+th('imp','Impact')+th('main','Main issue',1);
+    rowsHtml = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.oavg==null?'–':r.oavg.toFixed(2)}</td><td class="${cls(r.imp)}">${r.imp==null?'–':signed(r.imp)}</td><td class="l muted">${esc(r.main)}</td></tr>`).join('');
+  } else {
+    const ds = DS.team, oi = officeName ? ds.offices.indexOf(officeName) : -1;
+    const list = [...aggregate(ds,from,to,oi).values()].filter(a=>a.rcnt>=minN && avg(a.rsum,a.rcnt)<maxR)
+      .map(a=>({office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, ti:totalIssues(a.iss), main:topIssue(a.iss,ds.issues)}));
+    sortList(list);
+    count = list.length; title = 'Cleaners needing attention'; sub = 'Lowest rating first.';
+    head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+th('main','Main issue',1);
+    rowsHtml = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td><td class="l muted">${esc(r.main)}</td></tr>`).join('');
+  }
+  if (!count){ out.innerHTML = '<div class="panel empty">Nobody matches these filters. Try a lower minimum or a higher rating limit.</div>'; return; }
+  out.innerHTML = `<div class="panel"><h2>${title} <span class="muted" style="font-weight:400">· ${count}</span></h2><p class="sub">${sub} Showing at least ${minN} ratings, rating below ${maxR}.</p>
+    <div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${rowsHtml}</tbody></table></div>${count>shown?`<button class="chip more" id="more">Show more (${count-shown} remaining)</button>`:''}</div>`;
+}
+function sortList(list){
+  const get = r => r[sortKey]==null ? (sortDir>0?Infinity:-Infinity) : r[sortKey];
+  list.sort((a,b)=>{ const x=get(a), y=get(b); const c = typeof x==='string' ? x.localeCompare(y,'da') : (x===y?0:x-y); return c*sortDir || a.name.localeCompare(b.name,'da'); });
+}
+const th = (k,l,left) => `<th data-k="${k}" class="${left?'l':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}">${l}</th>`;
+
+/* ---------- team view ---------- */
 function renderTeam(){
   const ds = DS.team, out = $('#out');
-  const oi = $('#office').value ? ds.offices.indexOf($('#office').value) : -1;
-  const q = $('#q').value.trim().toLowerCase();
-  let list = [...aggregate(ds, $('#from').value, $('#to').value, oi).values()].map(a => {
+  const oi = $('#office').value ? ds.offices.indexOf($('#office').value) : -1, q = $('#q').value.trim().toLowerCase();
+  const list = [...aggregate(ds,$('#from').value,$('#to').value,oi).values()].map(a=>{
     const ti = totalIssues(a.iss);
-    return {office:ds.offices[a.o], name:ds.names[a.n], rating:rating(a.rsum,a.rcnt), rcnt:a.rcnt, ti, iss:a.iss.slice(1).map(v=>ti?v/ti:0)};
-  }).filter(r => r.rcnt>0 && (!q || r.name.toLowerCase().includes(q)));
-  const get = r => sortKey==='office'?r.office : sortKey==='name'?r.name : sortKey==='rating'?(r.rating??-1) : sortKey==='rcnt'?r.rcnt : sortKey==='ti'?r.ti : r.iss[+sortKey.slice(1)];
-  list.sort((a,b)=>{ const x=get(a), y=get(b); const c = typeof x==='string' ? x.localeCompare(y,'da') : x-y; return c*sortDir || a.name.localeCompare(b.name,'da'); });
+    const r = {office:ds.offices[a.o], name:ds.names[a.n], rating:avg(a.rsum,a.rcnt), rcnt:a.rcnt, ti};
+    a.iss.slice(1).forEach((v,i)=>r['i'+i]=ti?v/ti:0); return r;
+  }).filter(r=>r.rcnt>0 && (!q || r.name.toLowerCase().includes(q)));
+  sortList(list);
   if (!list.length){ out.innerHTML = '<div class="panel empty">No ratings in the selected period.</div>'; return; }
-  const th = (k,l,left) => `<th data-k="${k}" class="${left?'l':''}" aria-sort="${sortKey===k?(sortDir>0?'ascending':'descending'):'none'}">${l}</th>`;
-  const head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+
-    SHORT.slice(1).map((l,i)=>th('i'+i,l+' %')).join('');
-  const body = list.slice(0,shown).map(r => `<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td>${
-    r.iss.map(p=>`<td class="${p?'':'muted'}">${pct(p)}</td>`).join('')}</tr>`).join('');
-  out.innerHTML = `<div class="panel"><h2>${list.length} team members</h2><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${
+  const head = th('office','Office',1)+th('name','Team member',1)+th('rating','Rating')+th('rcnt','Ratings')+th('ti','Issues')+SHORT.slice(1).map((l,i)=>th('i'+i,l+' %')).join('');
+  const body = list.slice(0,shown).map(r=>`<tr><td>${esc(r.office)}</td><td class="l">${esc(r.name)}</td><td>${badge(r.rating)}</td><td>${r.rcnt}</td><td>${r.ti}</td>${
+    SHORT.slice(1).map((_,i)=>`<td class="${r['i'+i]?'':'muted'}">${pct(r['i'+i])}</td>`).join('')}</tr>`).join('');
+  out.innerHTML = `<div class="panel"><h2>${list.length} team members</h2><p class="sub">Click a column to sort.</p><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${
     list.length>shown?`<button class="chip more" id="more">Show more (${list.length-shown} remaining)</button>`:''}</div>`;
 }
 
@@ -248,11 +345,15 @@ document.addEventListener('click', e => {
   const t = e.target.closest('.tab'); if (t) return setTab(t.dataset.tab);
   const c = e.target.closest('.chip[data-i]');
   if (c){ const p = presets()[+c.dataset.i]; $('#from').value=p[1]; $('#to').value=p[2]; shown=300; return render(); }
-  if (e.target.id==='more'){ shown += 300; return renderTeam(); }
+  if (e.target.id==='more'){ shown += 300; return render(); }
+  if (e.target.id==='kV' || e.target.id==='kC'){
+    wKind = e.target.id==='kV' ? 'vendors' : 'cleaners'; sortKey = wKind==='vendors' ? 'imp' : 'rating'; sortDir = 1; shown = 300;
+    $('#kV').setAttribute('aria-pressed', wKind==='vendors'); $('#kC').setAttribute('aria-pressed', wKind==='cleaners'); return render();
+  }
   const h = e.target.closest('th[data-k]');
-  if (h){ const k=h.dataset.k; if (sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=(k==='office'||k==='name')?1:-1; } renderTeam(); }
+  if (h){ const k=h.dataset.k; if (sortKey===k) sortDir*=-1; else { sortKey=k; sortDir=1; } render(); }
 });
-for (const id of ['from','to','office','who','q']) $('#'+id).addEventListener('input', () => { shown=300; render(); });
+for (const id of ['from','to','office','who','q','minN','maxR']) $('#'+id).addEventListener('input', () => { shown=300; render(); });
 
 /* ---------- init ---------- */
 (async function(){
@@ -265,11 +366,10 @@ for (const id of ['from','to','office','who','q']) $('#'+id).addEventListener('i
   const h = readHash(), p = presets()[1];
   $('#from').value = h.from || p[1]; $('#to').value = h.to || p[2];
   $('#from').min = $('#to').min = DS.vendor.dates[0]; $('#from').max = $('#to').max = DS.vendor.dates.at(-1);
-  $('#upd').textContent = `Data up to ${DS.vendor.dates.at(-1)} · updated ${DS.vendor.updated}`;
+  $('#upd').textContent = `Guest cleaning ratings · data up to ${DS.vendor.dates.at(-1)} · updated ${DS.vendor.updated}`;
   if (h.vendor) $('#who').value = h.vendor;
-  tab = h.tab==='team' ? 'team' : 'vendor';
   fillOffices(); if (h.office) $('#office').value = h.office;
-  setTab(tab);
+  setTab(['vendor','watch','team'].includes(h.tab) ? h.tab : 'vendor');
 })();
 </script>
 </body>
